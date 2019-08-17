@@ -10,6 +10,7 @@ import { BuffTimerViewComponent } from './views/buff-timer-view/buff-timer-view.
 import { HomeViewComponent } from './views/home-view/home-view.component';
 import { CheatSheetViewComponent } from './views/cheat-sheet-view/cheat-sheet-view.component';
 import { MaterialModule } from './modules/material.module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,7 @@ import { MaterialModule } from './modules/material.module';
     HomeViewComponent,
     CheatSheetViewComponent
   ],
-  imports: [BrowserModule, AppRoutingModule, MaterialModule, BrowserAnimationsModule],
+  imports: [BrowserModule, AppRoutingModule, MaterialModule, BrowserAnimationsModule, ReactiveFormsModule],
   providers: [],
   bootstrap: [AppComponent]
 })

@@ -10,6 +10,9 @@
           "style": "scss"
         }
       },
+      "cli": {
+        "defaultCollection": "@ngrx/schematics"
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",

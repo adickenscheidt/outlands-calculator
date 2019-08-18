@@ -11,6 +11,7 @@ import { HomeViewComponent } from './views/home-view/home-view.component';
 import { CheatSheetViewComponent } from './views/cheat-sheet-view/cheat-sheet-view.component';
 import { MaterialModule } from './modules/material.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { BuildEditorComponent } from './shared/build-editor/build-editor.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     CalculatorViewComponent,
     BuffTimerViewComponent,
     HomeViewComponent,
-    CheatSheetViewComponent
+    CheatSheetViewComponent,
+    BuildEditorComponent
   ],
   imports: [BrowserModule, AppRoutingModule, MaterialModule, BrowserAnimationsModule, ReactiveFormsModule],
   providers: [],

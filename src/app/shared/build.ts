@@ -3,6 +3,7 @@ export interface Build {
   str: number;
   dex: number;
   int: number;
+  buildName?: string;
   skills: { skillName: string; value: number }[];
-  aspects: { armor: string; weapon: string; book: string };
+  aspects?: { armor: string; weapon: string; book: string };
 }

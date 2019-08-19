@@ -11,11 +11,14 @@ import { BuffTimerViewComponent } from './views/buff-timer-view/buff-timer-view.
 import { HomeViewComponent } from './views/home-view/home-view.component';
 import { CheatSheetViewComponent } from './views/cheat-sheet-view/cheat-sheet-view.component';
 import { MaterialModule } from './modules/material.module';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { BuildEditorComponent } from './shared/build-editor/build-editor.component';
 import { StoreModule } from '@ngrx/store';
 import { reducers, metaReducers } from './store/reducers';
 import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from 'src/environments/environment';
+import { ActiveBuildSelectComponent } from './shared/active-build-select/active-build-select.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +28,8 @@ import { EffectsModule } from '@ngrx/effects';
     BuffTimerViewComponent,
     HomeViewComponent,
     CheatSheetViewComponent,
-    BuildEditorComponent
+    BuildEditorComponent,
+    ActiveBuildSelectComponent
   ],
   imports: [
     BrowserModule,
@@ -33,6 +37,7 @@ import { EffectsModule } from '@ngrx/effects';
     MaterialModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    FormsModule,
     StoreModule.forRoot(reducers, {
       metaReducers,
       runtimeChecks: {
@@ -41,6 +46,10 @@ import { EffectsModule } from '@ngrx/effects';
       }
     }),
     EffectsModule.forRoot([BuildEffects]),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25, // Retains last 25 states
+      logOnly: environment.production, // Restrict extension to log-only mode
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent]

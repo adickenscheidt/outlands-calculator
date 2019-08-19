@@ -1,0 +1,7 @@
+<mat-form-field>
+    <mat-select [ngModel]="(build$ | async).activeBuildId"
+                (ngModelChange)="activeBuildChange($event)">
+        <mat-option *ngFor="let build of (build$ | async).builds"
+                    [value]="build.id">{{build.buildName}}</mat-option>
+    </mat-select>
+</mat-form-field>

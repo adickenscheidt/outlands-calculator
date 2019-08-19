@@ -57,6 +57,17 @@
         <mat-divider></mat-divider>
         <mat-card-content>
             <h2>Skills</h2>
+            <mat-form-field>
+                <mat-select formControlName="skillToAdd">
+                    <mat-option *ngFor="let skill of (availableSkills$ | async)"
+                                [value]="skill.skillName">{{skill.displayName}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <ng-container *ngIf="form.get('skills').value">
+                <ng-container *ngFor="let skill of form.get('skills').value">
+                    {{skill.skillName}}
+                </ng-container>
+            </ng-container>
         </mat-card-content>
         <mat-card-footer>
             <button mat-raised-button

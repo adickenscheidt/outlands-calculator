@@ -1,7 +1,11 @@
+import { Skill } from './../skills';
 import { aspects } from './../aspects';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { Build } from '../build';
+import { skills } from '../skills';
+import { Observable, from, of } from 'rxjs';
+import { distinctUntilChanged, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-build-editor',
@@ -33,9 +37,16 @@ export class BuildEditorComponent implements OnInit {
 
   public form: FormGroup;
 
+  public availableSkills$ = of(skills);
+
   constructor(private fb: FormBuilder) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.form
+      .get('skillToAdd')
+      .valueChanges.pipe(distinctUntilChanged())
+      .subscribe(s => this.skillSelected(s));
+  }
 
   public getFormGroup(build: Build): FormGroup {
     return this.fb.group({
@@ -44,8 +55,16 @@ export class BuildEditorComponent implements OnInit {
       str: new FormControl(!!build ? build.str : 0, [Validators.min(0), Validators.max(125)]),
       dex: new FormControl(!!build ? build.dex : 0, [Validators.min(0), Validators.max(125)]),
       int: new FormControl(!!build ? build.int : 0, [Validators.min(0), Validators.max(125)]),
-      skills: !!build ? build.skills : []
+      skills: this.fb.array(this.getFormGroupSkillArray(build.skills)),
+      skillToAdd: null
     });
+  }
+
+  public getFormGroupSkillArray(arrSkills: { skillName: string; value: number }[]): FormGroup[] {
+    if (!arrSkills) {
+      return [];
+    }
+    return arrSkills.map(s => this.fb.group(s));
   }
 
   public saveClicked() {
@@ -62,5 +81,10 @@ export class BuildEditorComponent implements OnInit {
 
   public deleteBuildClicked() {
     this.deleteBuild.emit(this.build.id);
+  }
+
+  public skillSelected(skillName: string) {
+    const skillArr = this.form.get('skills') as FormArray;
+    skillArr.push(this.fb.group({ skillName, value: 0 }));
   }
 }

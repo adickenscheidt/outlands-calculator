@@ -19,7 +19,6 @@ export class CalculatorViewComponent implements OnInit {
       }
       return null;
     }),
-    tap(s => console.log(s))
   );
 
   constructor(private store: Store<State>) {}

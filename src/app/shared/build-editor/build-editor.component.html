@@ -2,7 +2,15 @@
     <mat-card>
         <mat-card-header>Choose Build</mat-card-header>
         <mat-card-content>
-            <app-active-build-select></app-active-build-select>
+            <span>
+                <app-active-build-select></app-active-build-select>
+                <button mat-raised-button
+                        color="warn"
+                        (click)="deleteBuildClicked()">Delete</button>
+                <button mat-raised-button
+                        color="accent"
+                        (click)="newBuildClicked()">New Build</button>
+            </span>
         </mat-card-content>
     </mat-card>
     <br>
@@ -65,8 +73,6 @@
                 </mat-select>
             </mat-form-field>
             <ng-container *ngIf="form.get('skills').value">
-
-
                 <div formArrayName="skills"
                      *ngFor="let skill of skillsControl; let i = index;">
                     <mat-form-field [formGroupName]="i">
@@ -84,26 +90,14 @@
                         </button>
                     </mat-form-field>
                 </div>
-
-                <!-- <ng-container *ngFor="let skill of form.get('skills').value">
-                    <mat-form-field>
-                        <input mapInput>
-                    </mat-form-field>
-                </ng-container> -->
             </ng-container>
         </mat-card-content>
         <mat-card-footer>
             <button mat-raised-button
-                    color="accent"
-                    (click)="newBuildClicked()">New Build</button>
-            <button mat-raised-button
                     color="primary"
                     (click)="saveClicked()">Save</button>
             <button mat-raised-button
-                    (click)="cancelClicked()">Cancel</button>
-            <button mat-raised-button
-                    color="warn"
-                    (click)="deleteBuildClicked()">Delete</button>
+                    (click)="cancelClicked()">Reset</button>
         </mat-card-footer>
     </mat-card>
 </ng-container>

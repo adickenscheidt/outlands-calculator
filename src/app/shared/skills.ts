@@ -5,6 +5,8 @@ export interface Skill {
   pvpSpellDamageBonus?(value: number): number;
   pvmMeleeDamageBonus?(value: number): number;
   pvpMeleeDamageBonus?(value: number): number;
+  globalMeleeDamageBonus?(value: number): number;
+  globalSpellDamageBonus?(value: number): number;
 }
 
 export const skills: Skill[] = [
@@ -17,5 +19,35 @@ export const skills: Skill[] = [
   {
     skillName: 'magery',
     displayName: 'Magery'
+  },
+  {
+    skillName: 'anatomy',
+    displayName: 'Anatomy',
+    globalMeleeDamageBonus: value => 0.2 * (value / 100)
+  },
+  {
+    skillName: 'archery',
+    displayName: 'Archery'
+  },
+  {
+    skillName: 'fencing',
+    displayName: 'Fencing'
+  },
+  {
+    skillName: 'macing',
+    displayName: 'Mace Fighting'
+  },
+  {
+    skillName: 'swordsmanship',
+    displayName: 'Swordsmanship'
+  },
+  {
+    skillName: 'wrestling',
+    displayName: 'Wrestling'
+  },
+  {
+    skillName: 'tactics',
+    displayName: 'Tactics',
+    globalMeleeDamageBonus: value => 1.0 * (value / 100)
   }
 ];

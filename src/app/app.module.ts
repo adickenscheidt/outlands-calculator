@@ -19,6 +19,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from 'src/environments/environment';
 import { ActiveBuildSelectComponent } from './shared/active-build-select/active-build-select.component';
+import { BuildEvaluationResultComponent } from './shared/build-evaluation-result/build-evaluation-result.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { ActiveBuildSelectComponent } from './shared/active-build-select/active-
     HomeViewComponent,
     CheatSheetViewComponent,
     BuildEditorComponent,
-    ActiveBuildSelectComponent
+    ActiveBuildSelectComponent,
+    BuildEvaluationResultComponent
   ],
   imports: [
     BrowserModule,

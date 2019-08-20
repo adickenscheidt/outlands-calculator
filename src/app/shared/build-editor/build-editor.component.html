@@ -58,15 +58,38 @@
         <mat-card-content>
             <h2>Skills</h2>
             <mat-form-field>
+                <mat-label>Choose a skill</mat-label>
                 <mat-select formControlName="skillToAdd">
                     <mat-option *ngFor="let skill of (availableSkills$ | async)"
                                 [value]="skill.skillName">{{skill.displayName}}</mat-option>
                 </mat-select>
             </mat-form-field>
             <ng-container *ngIf="form.get('skills').value">
-                <ng-container *ngFor="let skill of form.get('skills').value">
-                    {{skill.skillName}}
-                </ng-container>
+
+
+                <div formArrayName="skills"
+                     *ngFor="let skill of skillsControl; let i = index;">
+                    <mat-form-field [formGroupName]="i">
+                        <!-- <mat-label>{{getDisplayName(skill.get('skillName').value)}}</mat-label> -->
+                        <input matInput
+                               formControlName="value"
+                               [placeholder]="getDisplayName(skill.get('skillName').value)"
+                               type="number"
+                               max="120"
+                               min="0">
+                        <button mat-icon-button
+                                matSuffix
+                                (click)="removeSkill(skill.get('skillName').value)">
+                            <mat-icon>remove_circle</mat-icon>
+                        </button>
+                    </mat-form-field>
+                </div>
+
+                <!-- <ng-container *ngFor="let skill of form.get('skills').value">
+                    <mat-form-field>
+                        <input mapInput>
+                    </mat-form-field>
+                </ng-container> -->
             </ng-container>
         </mat-card-content>
         <mat-card-footer>

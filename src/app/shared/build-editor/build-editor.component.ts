@@ -1,11 +1,11 @@
 import { Skill } from './../skills';
 import { aspects } from './../aspects';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { Build } from '../build';
 import { skills } from '../skills';
-import { Observable, from, of } from 'rxjs';
-import { distinctUntilChanged, tap } from 'rxjs/operators';
+import { Observable, from, of, BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged, tap, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-build-editor',
@@ -36,16 +36,23 @@ export class BuildEditorComponent implements OnInit {
   public deleteBuild: EventEmitter<string> = new EventEmitter<string>();
 
   public form: FormGroup;
+  public get skillsControl() {
+    return (this.form.get('skills') as FormArray).controls;
+  }
 
-  public availableSkills$ = of(skills);
+  public availableSkills$: BehaviorSubject<Skill[]>;
 
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
     this.form
       .get('skillToAdd')
-      .valueChanges.pipe(distinctUntilChanged())
+      .valueChanges.pipe(
+        filter(v => v != null),
+      )
       .subscribe(s => this.skillSelected(s));
+
+    this.availableSkills$ = new BehaviorSubject(this.getAvailableSkills());
   }
 
   public getFormGroup(build: Build): FormGroup {
@@ -85,6 +92,31 @@ export class BuildEditorComponent implements OnInit {
 
   public skillSelected(skillName: string) {
     const skillArr = this.form.get('skills') as FormArray;
-    skillArr.push(this.fb.group({ skillName, value: 0 }));
+    skillArr.push(this.fb.group({ skillName, value: 0 }, [Validators.min(0), Validators.max(120)]));
+    this.form.get('skillToAdd').setValue(null);
+    this.updateAvailableSkills();
+  }
+
+  public removeSkill(skillName: string) {
+    const skillArr = this.form.get('skills') as FormArray;
+    const index = skillArr.controls.indexOf(skillArr.controls.find(c => c.get('skillName').value === skillName));
+    if (index !== -1) {
+      skillArr.removeAt(index);
+      this.updateAvailableSkills();
+      this.form.get('skillToAdd').setValue(null);
+    }
+  }
+
+  public getDisplayName(skillName: string) {
+    return skills.find(s => s.skillName === skillName).displayName;
+  }
+
+  private updateAvailableSkills() {
+    this.availableSkills$.next(this.getAvailableSkills());
+  }
+
+  private getAvailableSkills(): Skill[] {
+    const skillArr = this.form.get('skills');
+    return skills.filter(skill => skillArr.value.find((s: Skill) => s.skillName === skill.skillName) == null);
   }
 }

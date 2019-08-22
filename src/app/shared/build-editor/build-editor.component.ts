@@ -4,8 +4,11 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { Build } from '../build';
 import { skills } from '../skills';
-import { Observable, from, of, BehaviorSubject } from 'rxjs';
-import { distinctUntilChanged, tap, filter } from 'rxjs/operators';
+import { Observable, from, of, BehaviorSubject, Subscription } from 'rxjs';
+import { distinctUntilChanged, tap, filter, map, skip, debounceTime } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { State } from 'src/app/store/reducers';
+import { saveBuild, cancelBuildEdit, activeBuildChanged } from 'src/app/store/actions/build.actions';
 
 @Component({
   selector: 'app-build-editor',
@@ -13,55 +16,48 @@ import { distinctUntilChanged, tap, filter } from 'rxjs/operators';
   styleUrls: ['./build-editor.component.scss']
 })
 export class BuildEditorComponent implements OnInit {
-  private _build: Build;
-  public get build(): Build {
-    return this._build;
-  }
-  @Input()
-  public set build(value: Build) {
-    this._build = value;
-    this.form = this.getFormGroup(value);
-  }
-
-  @Input()
-  public builds: Build[];
-
-  @Output()
-  public buildSaved: EventEmitter<Build> = new EventEmitter<Build>();
-
-  @Output()
-  public newBuild: EventEmitter<void> = new EventEmitter<void>();
-
-  @Output()
-  public deleteBuild: EventEmitter<string> = new EventEmitter<string>();
+  public activeUnsavedBuild$ = this.store.select(s => s.build.activeUnsavedBuild);
 
   public form: FormGroup;
+  public skillsToAddSubscription: Subscription;
+  public buildChangedSubscription: Subscription;
+
   public get skillsControl() {
     return (this.form.get('skills') as FormArray).controls;
   }
 
   public availableSkills$: BehaviorSubject<Skill[]>;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private store: Store<State>) {}
 
   ngOnInit() {
-    this.form
-      .get('skillToAdd')
-      .valueChanges.pipe(
-        filter(v => v != null),
-      )
-      .subscribe(s => this.skillSelected(s));
+    this.activeUnsavedBuild$
+      // .pipe(distinctUntilChanged((bOld, bNew) => bOld.id === bNew.id))
+      .subscribe(s => this.unsavedBuildChanged(s));
 
     this.availableSkills$ = new BehaviorSubject(this.getAvailableSkills());
   }
 
+  private resubscribeToForm() {
+    this.skillsToAddSubscription = this.form
+      .get('skillToAdd')
+      .valueChanges.pipe(filter(v => v != null))
+      .subscribe(s => this.skillSelected(s));
+
+    this.buildChangedSubscription = this.form.valueChanges
+      .pipe(
+        debounceTime(2000)
+      )
+      .subscribe(b => this.store.dispatch(activeBuildChanged(b)));
+  }
+
   public getFormGroup(build: Build): FormGroup {
     return this.fb.group({
-      id: !!build ? build.id : null,
-      buildName: new FormControl(!!build ? build.buildName : '', [Validators.maxLength(30)]),
-      str: new FormControl(!!build ? build.str : 0, [Validators.min(0), Validators.max(125)]),
-      dex: new FormControl(!!build ? build.dex : 0, [Validators.min(0), Validators.max(125)]),
-      int: new FormControl(!!build ? build.int : 0, [Validators.min(0), Validators.max(125)]),
+      id: build.id,
+      buildName: new FormControl(build.buildName, [Validators.maxLength(30)]),
+      str: new FormControl(build.str, [Validators.min(0), Validators.max(125)]),
+      dex: new FormControl(build.dex, [Validators.min(0), Validators.max(125)]),
+      int: new FormControl(build.int, [Validators.min(0), Validators.max(125)]),
       skills: this.fb.array(this.getFormGroupSkillArray(build.skills)),
       skillToAdd: null
     });
@@ -75,19 +71,11 @@ export class BuildEditorComponent implements OnInit {
   }
 
   public saveClicked() {
-    this.buildSaved.emit({ ...this.form.value });
-  }
-
-  public newBuildClicked() {
-    this.newBuild.emit();
+    this.store.dispatch(saveBuild());
   }
 
   public cancelClicked() {
-    this.form = this.getFormGroup(this._build);
-  }
-
-  public deleteBuildClicked() {
-    this.deleteBuild.emit(this.build.id);
+    this.store.dispatch(cancelBuildEdit());
   }
 
   public skillSelected(skillName: string) {
@@ -118,5 +106,17 @@ export class BuildEditorComponent implements OnInit {
   private getAvailableSkills(): Skill[] {
     const skillArr = this.form.get('skills');
     return skills.filter(skill => skillArr.value.find((s: Skill) => s.skillName === skill.skillName) == null);
+  }
+
+  private unsavedBuildChanged(newBuild: Build) {
+    this.form = this.getFormGroup(newBuild);
+
+    if (!!this.skillsToAddSubscription) {
+      this.skillsToAddSubscription.unsubscribe();
+    }
+    if (!!this.buildChangedSubscription) {
+      this.buildChangedSubscription.unsubscribe();
+    }
+    this.resubscribeToForm();
   }
 }

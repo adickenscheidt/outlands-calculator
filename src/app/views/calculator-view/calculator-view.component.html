@@ -3,13 +3,25 @@
     design the most powerful builds!</p>
 <div class="row">
     <div class="column">
-        <app-build-editor (buildSaved)="buildSaved($event)"
-                          (newBuild)="newBuild()"
-                          (deleteBuild)="deleteBuild($event)"
-                          [build]="currentBuild$ | async"
-                          [builds]="(build$ | async)?.builds"></app-build-editor>
+        <mat-card>
+            <mat-card-header>Choose Build</mat-card-header>
+            <mat-card-content>
+                <span>
+                    <app-active-build-select></app-active-build-select>
+                    <button mat-raised-button
+                            color="warn"
+                            (click)="deleteBuild()">Delete</button>
+                    <button mat-raised-button
+                            color="accent"
+                            (click)="newBuild()">New Build</button>
+                </span>
+            </mat-card-content>
+        </mat-card>
+        <br>
+        <app-build-editor></app-build-editor>
     </div>
     <div class="column">
         <h2>Results</h2>
+        <app-build-evaluation-result [build]="currentBuild$ | async"></app-build-evaluation-result>
     </div>
 </div>

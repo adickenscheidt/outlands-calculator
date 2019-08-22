@@ -16,6 +16,8 @@ export class ActiveBuildSelectComponent implements OnInit {
 
   ngOnInit() {}
 
+  
+
   public activeBuildChange(id: string) {
     this.store.dispatch(loadBuild({ id }));
   }

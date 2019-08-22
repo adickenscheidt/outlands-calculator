@@ -11,29 +11,16 @@ import { map, tap } from 'rxjs/operators';
   styleUrls: ['./calculator-view.component.scss']
 })
 export class CalculatorViewComponent implements OnInit {
-  public build$ = this.store.select(s => s.build);
-  public currentBuild$ = this.build$.pipe(
-    map(b => {
-      if (!!b.activeBuildId) {
-        return b.builds.find(build => build.id === b.activeBuildId);
-      }
-      return null;
-    }),
-  );
 
   constructor(private store: Store<State>) {}
 
   ngOnInit() {}
 
-  public buildSaved(build: Build) {
-    this.store.dispatch(saveBuild(build));
-  }
-
   public newBuild() {
     this.store.dispatch(newBuild());
   }
 
-  public deleteBuild(id: string) {
-    this.store.dispatch(deleteBuild({ id }));
+  public deleteBuild() {
+    this.store.dispatch(deleteBuild());
   }
 }

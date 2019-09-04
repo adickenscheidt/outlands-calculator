@@ -22,11 +22,24 @@ export const initialState: BuildState = {
 };
 
 function getNewUnsavedBuild(): Build {
-  return { id: Guid.create().toString(), buildName: 'new build', str: 0, dex: 0, int: 0, skills: [] };
+  return { id: Guid.create().toString(), buildName: 'New build', str: 0, dex: 0, int: 0, skills: [] };
 }
 
 const buildReducer = createReducer(
   initialState,
+  on(buildActions.initBuild, state => {
+    const clonedState: BuildState = cloneDeep(state);
+    if (!clonedState.activeBuildId) {
+      if (!state.builds.length) {
+        const newBuild = getNewUnsavedBuild();
+        clonedState.activeBuildId = newBuild.id;
+        clonedState.builds.push(newBuild);
+      } else {
+        clonedState.activeBuildId = clonedState.builds[0].id;
+      }
+    }
+    return { ...clonedState };
+  }),
   on(buildActions.newBuild, state => {
     const newBuild = getNewUnsavedBuild();
     return {
@@ -55,11 +68,14 @@ const buildReducer = createReducer(
   }),
   on(buildActions.deleteBuild, state => {
     const newArr = state.builds.filter(b => b.id !== state.activeUnsavedBuild.id);
-    const newActiveBuild = newArr.length > 0 ? newArr[0] : getNewUnsavedBuild();
+    if (newArr.length <= 0) {
+      newArr.push(getNewUnsavedBuild());
+    }
+    const newActiveBuild = newArr[0];
     return {
       ...state,
       builds: cloneDeep(newArr),
-      activeBuildId: newArr.length > 0 ? newActiveBuild.id : null,
+      activeBuildId: newActiveBuild.id,
       activeUnsavedBuild: cloneDeep(newActiveBuild)
     };
   }),
